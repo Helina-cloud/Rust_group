@@ -21,16 +21,16 @@ impl Obstacle {
     }
     // 渲染障碍物
     pub fn render(&mut self, ctx: &mut BTerm, player_x: i32) {
-        let screen_x = self.x - player_x; // 屏幕上的空间
         let half_size = self.size / 2;
+        self.x -= 1; //更新横坐标，左移1
 
         // 上边的
         for y in 0..self.gap_y - half_size {
-            ctx.set(screen_x, y, RED, BLACK, to_cp437('|'));
+            ctx.set(self.x, y, RED, BLACK, to_cp437('|'));
         }
         // 下边的
         for y in self.gap_y + half_size..SCREEN_HEIGHT {
-            ctx.set(screen_x, y, RED, BLACK, to_cp437('|'))
+            ctx.set(self.x, y, RED, BLACK, to_cp437('|'))
         }
     }
     /// 判断是否撞到

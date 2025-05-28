@@ -16,7 +16,7 @@ enum GameMode {
 }
 
 /// 游戏屏幕宽度
-const SCREEN_WIDTH: i32 = 80;
+const SCREEN_WIDTH: i32 = 90;
 /// 游戏屏幕高度
 const SCREEN_HEIGHT: i32 = 50;
 /// 每隔75毫秒做一些事情
@@ -60,18 +60,30 @@ impl State {
     }
 
     fn play(&mut self, ctx: &mut BTerm) {
-        ctx.cls_bg(YELLOW);
+        ctx.cls_bg(YELLOWGREEN);
         // frame_time_ms 记录了每次调用tick所经过的时间
         self.frame_time += ctx.frame_time_ms;
+
         // 向前移动并且重力增加
         if self.frame_time > FRAME_DURATION {
             self.frame_time = 0.0;
             self.player.gravity_and_move();
         }
+
+        // 新增：处理左右移动输入
+        if let Some(key) = ctx.key {
+            match key {
+                VirtualKeyCode::Left => self.player.move_left(),
+                VirtualKeyCode::Right => self.player.move_right(),
+                VirtualKeyCode::Space => self.player.flap(),
+                _ => {}
+            }
+        }
         // 空格触发，往上飞
         if let Some(VirtualKeyCode::Space) = ctx.key {
             self.player.flap();
         }
+
         // 渲染
         self.player.render(ctx);
         ctx.print(0, 0, "Press Space to Flap");
@@ -82,7 +94,7 @@ impl State {
         if self.player.x > self.obstacle.x {
             self.score += 1;
             // 渲染新的障碍物
-            self.obstacle = Obstacle::new(self.player.x + SCREEN_WIDTH, self.score);
+            self.obstacle = Obstacle::new(SCREEN_WIDTH, self.score);
         }
         // 如果y 大于游戏高度，就是坠地或者撞到障碍物，则游戏结束
         if self.player.y > SCREEN_HEIGHT || self.obstacle.hit_obstacle(&self.player) {
