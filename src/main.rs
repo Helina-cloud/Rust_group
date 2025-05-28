@@ -60,7 +60,7 @@ impl State {
     }
 
     fn play(&mut self, ctx: &mut BTerm) {
-        ctx.cls_bg(YELLOWGREEN);
+        ctx.cls_bg(YELLOW);
         // frame_time_ms 记录了每次调用tick所经过的时间
         self.frame_time += ctx.frame_time_ms;
         // 向前移动并且重力增加
