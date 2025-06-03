@@ -44,12 +44,16 @@ impl State {
     }
 
     fn main_menu(&mut self, ctx: &mut BTerm) {
-        // 清空屏幕
+        
+        //ctx.print_centered(5, "Welcome to Flappy Dragon！");
+        // 先清空屏幕
         ctx.cls();
+        self.set_background(ctx, "assets/menu_bg.png"); // 菜单背景
         ctx.print_centered(5, "Welcome to Flappy Dragon！");
         ctx.print_centered(8, "(P) Play Game");
         ctx.print_centered(9, "(Q) Quit Game");
-        self.set_background(ctx, "assets/background.png");
+        
+        //self.set_background(ctx, "assets/background.png");
         if let Some(key) = ctx.key {
             match key {
                 VirtualKeyCode::P => self.restart(),
@@ -60,7 +64,9 @@ impl State {
     }
 
     fn play(&mut self, ctx: &mut BTerm) {
-        ctx.cls_bg(YELLOWGREEN);
+        ctx.cls();
+        self.set_background(ctx, "assets/game_bg.png"); // 游戏背景
+        //ctx.cls_bg(YELLOWGREEN);
         // frame_time_ms 记录了每次调用tick所经过的时间
         self.frame_time += ctx.frame_time_ms;
 
@@ -103,6 +109,7 @@ impl State {
     }
 
     fn dead(&mut self, ctx: &mut BTerm) {
+        self.set_background(ctx, "assets/end_bg.png"); // 结束背景
         ctx.print_centered(5, "You are dead！");
         ctx.print_centered(6, &format!("You earned {} points", self.score));
         ctx.print_centered(8, "(P) Play Again");
@@ -146,6 +153,9 @@ impl State {
             let (img_width, img_height) = img.dimensions();
             for x in 0..img_width {
                 for y in 0..img_height {
+                    // 计算图片坐标（平铺效果）
+                    // let img_x = (x as u32) % img_width;
+                    // let img_y = (y as u32) % img_height;
                     let pixel = img.get_pixel(x, y);
                     ctx.set_bg(x as i32, y as i32, (pixel[0], pixel[1], pixel[2]));
                 }
@@ -180,6 +190,7 @@ impl State {
     fn display_high_scores(&mut self, ctx: &mut BTerm) {
         let scores = Self::load_scores();
         ctx.cls();
+        self.set_background(ctx, "assets/scores_bg.png"); // 高分榜背景
         ctx.print_centered(5, "High Scores:");
         for (i, score) in scores.iter().enumerate().take(10) {
             ctx.print_centered(7 + i as i32, &format!("{}. {}", i + 1, score));
