@@ -81,7 +81,8 @@ impl State {
             match key {
                 VirtualKeyCode::Left => self.player.move_left(),
                 VirtualKeyCode::Right => self.player.move_right(),
-                VirtualKeyCode::Space => self.player.flap(),
+                VirtualKeyCode::Up => self.player.flap(),
+                VirtualKeyCode::Down => self.player.move_down(),
                 _ => {}
             }
         }

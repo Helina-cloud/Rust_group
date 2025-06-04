@@ -30,8 +30,8 @@ impl Player {
           ctx.set(self.x, self.y, YELLOW, BLACK, to_cp437('🤣'))
     }
     pub fn gravity_and_move(&mut self) {
-        if self.velocity < 2.0 {
-            self.velocity += 0.2
+        if self.velocity < 1.5 {
+            self.velocity += 0.3
         }
         self.y += self.velocity as i32;
 
@@ -53,5 +53,12 @@ impl Player {
 
     pub fn flap(&mut self) {
         self.velocity = -2.0
+    }
+
+     // 新增：向下移动方法
+    pub fn move_down(&mut self) {
+        if self.velocity < 1.5 {
+            self.velocity += 0.5
+        }  // 设置向下的速度
     }
 }
