@@ -2,6 +2,7 @@ mod obstacle;
 mod player;
 mod powerup;
 mod difficulty;
+mod audio;
 
 use bracket_lib::prelude::*;
 use image::*;
@@ -11,6 +12,8 @@ use powerup::{PowerUp, PowerUpType, ActivePowerUp};
 use difficulty::{Difficulty, DifficultySettings};
 use std::fs::{self, OpenOptions};
 use std::io::{self, Write};
+use audio::AudioSystem;
+use std::path::Path;
 
 #[derive(Clone)]
 enum GameMode {
@@ -50,10 +53,24 @@ struct State {
     lives: i32,
     combo_count: i32,
     last_obstacle_passed: i32,
+    audio: AudioSystem,
+    // bgm_playing: bool,
 }
 
 impl State {
     fn new() -> Self {
+        let mut audio = AudioSystem::new();
+        let bgm_path = "assets/sounds/game.wav";
+        // 调试输出确认路径
+        println!("Attempting to play BGM from: {}", bgm_path);
+        
+        // 检查文件是否存在
+        if !std::path::Path::new(bgm_path).exists() {
+            eprintln!("BGM file not found at: {}", bgm_path);
+        } else {
+
+            audio.play_bgm(bgm_path);
+        }
         State {
             player: Player::new(5, 25),
             frame_time: 0.0,
@@ -72,6 +89,8 @@ impl State {
             lives: 3,
             combo_count: 0,
             last_obstacle_passed: -1,
+            audio,
+            // bgm_playing: false,
         }
     }
 
@@ -218,14 +237,6 @@ impl State {
         // 移除超出屏幕的道具
         self.powerups.retain(|p| p.x > -5);
 
-        // 检查道具收集
-        // let mut collected_powerups = Vec::new();
-        // for (i, powerup) in self.powerups.iter().enumerate() {
-        //     if powerup.x == self.player.x && (powerup.y - self.player.y).abs() <= 1 {
-        //         collected_powerups.push(i);
-        //         self.activate_powerup(powerup.power_type.clone());
-        //     }
-        // }
         let mut collected_powerups = Vec::new();
         let mut power_types_to_activate = Vec::new();
 
@@ -364,6 +375,10 @@ impl State {
                 self.shield_timer = 0.0;
                 self.combo_count = 0; // 重置连击
             } else {
+                // // 播放碰撞音效
+                // if let Err(err) = self.audio.play_sfx("collision") {
+                //     eprintln!("Failed to play collision sound: {}", err);
+                // }
                 self.lives -= 1;
                 self.combo_count = 0;
                 
@@ -405,6 +420,7 @@ impl State {
     }
 
     fn dead(&mut self, ctx: &mut BTerm) {
+        self.audio.stop_bgm();
         self.set_background(ctx, "assets/end_bg.png");
         ctx.print_centered(5, "Game Over！");
         ctx.print_centered(6, &format!("You earned {} points", self.score));
@@ -548,8 +564,31 @@ impl GameState for State {
 }
 
 fn main() -> BError {
+    // 最小化音频测试
+    println!("=== 开始音频测试 ===");
+    
+    let mut audio = AudioSystem::new();
+    let test_path = "assets/sounds/game.wav"; 
+    
+    // 检查文件是否存在
+    if !std::path::Path::new(test_path).exists() {
+        eprintln!("错误：文件不存在 - {}", test_path);
+    } else {
+        println!("文件存在，尝试播放...");
+        audio.play_bgm(test_path);
+        
+        // 阻塞主线程以保持播放
+        println!("播放中（等待5秒...）");
+        std::thread::sleep(std::time::Duration::from_secs(5));
+    }
+
     let context = BTermBuilder::simple80x50()
         .with_title("Flappy Dragon - Enhanced Edition")
         .build()?;
-    main_loop(context, State::new())
+
+    let state = State::new();
+    // 使用 bracket-lib 提供的主循环
+    main_loop(context, state)
+
+    // main_loop(context, State::new())
 }
