@@ -98,14 +98,14 @@ impl State {
         ctx.cls();
         self.set_background(ctx, "assets/menu_bg.png");
         
-        ctx.print_centered(5, "Welcome to Flappy Dragon！");
-        ctx.print_centered(8, "(P) Play Game");
-        ctx.print_centered(9, "(D) Select Difficulty");
-        ctx.print_centered(10, "(H) High Scores");
-        ctx.print_centered(11, "(Q) Quit Game");
+        ctx.print_centered(5, "Welcome to Flappy Dragon!");
+        ctx.print(30,8, "(P) Play Game");
+        ctx.print(30,10, "(D) Select Difficulty");
+        ctx.print(30,12, "(H) High Scores");
+        ctx.print(30,14, "(Q) Quit Game");
         
         // 显示当前难度
-        ctx.print_centered(13, &format!("Current Difficulty: {:?}", self.selected_difficulty));
+        ctx.print_centered(17, &format!("Current Difficulty: {:?}", self.selected_difficulty));
         
         if let Some(key) = ctx.key {
             match key {
@@ -125,21 +125,29 @@ impl State {
         ctx.cls();
         self.set_background(ctx, "assets/menu_bg.png");
         
-        ctx.print_centered(5, "Select Difficulty");
-        ctx.print_centered(8, "(E) Easy - More lives, slower obstacles");
-        ctx.print_centered(9, "(N) Normal - Balanced gameplay");
-        ctx.print_centered(10, "(H) Hard - Faster obstacles, smaller gaps");
-        ctx.print_centered(11, "(I) Insane - Maximum challenge!");
-        ctx.print_centered(13, "(M) Back to Menu");
+        ctx.print(25,5, "Select Difficulty:");
+        ctx.print(30,8, "(E) Easy");
+        ctx.print(30,9, "    - More lives, slower obstacles");
+
+        ctx.print(30,11, "(N) Normal");
+        ctx.print(30,12, "    - Balanced gameplay");
+
+        ctx.print(30,14, "(H) Hard");
+        ctx.print(30,15, "    - Faster obstacles, smaller gaps");
+
+        ctx.print(30,17, "(I) Insane");
+        ctx.print(30,18, "    - Maximum challenge!");
+
+        ctx.print(30,22, "(M) Back to Menu");
         
         // 高亮当前选择
         let highlight_y = match self.selected_difficulty {
             Difficulty::Easy => 8,
-            Difficulty::Normal => 9,
-            Difficulty::Hard => 10,
-            Difficulty::Insane => 11,
+            Difficulty::Normal => 11,
+            Difficulty::Hard => 14,
+            Difficulty::Insane => 17,
         };
-        ctx.print_centered(highlight_y, ">>> SELECTED <<<");
+        ctx.print(30,highlight_y, ">>> SELECTED <<<");
         
         if let Some(key) = ctx.key {
             match key {
@@ -327,9 +335,9 @@ impl State {
 
     fn render_ui(&mut self, ctx: &mut BTerm) {
         ctx.print(0, 0, "Controls: Arrow Keys/Space, ESC to Pause");
-        ctx.print(0, 1, &format!("Score: {} | Lives: {} | Combo: {}", 
+        ctx.print(0, 2, &format!("Score: {}  |  Lives: {}  |  Combo: {}", 
                                  self.score, self.lives, self.combo_count));
-        ctx.print(0, 2, &format!("Difficulty: {:?}", self.selected_difficulty));
+        ctx.print(0, 4, &format!("Current Difficulty: {:?}", self.selected_difficulty));
         
         // 显示激活的道具效果
         let mut y_offset = 4;
@@ -404,10 +412,10 @@ impl State {
             }
         }
         
-        ctx.print_centered(20, "GAME PAUSED");
-        ctx.print_centered(22, "(R) Resume");
-        ctx.print_centered(23, "(M) Main Menu");
-        ctx.print_centered(24, "(Q) Quit");
+        ctx.print_centered(20, "GAME PAUSED!");
+        ctx.print(35,23, "(R) Resume");
+        ctx.print(35,25, "(M) Main Menu");
+        ctx.print(35,27, "(Q) Quit");
         
         if let Some(key) = ctx.key {
             match key {
@@ -422,14 +430,14 @@ impl State {
     fn dead(&mut self, ctx: &mut BTerm) {
         self.audio.stop_bgm();
         self.set_background(ctx, "assets/end_bg.png");
-        ctx.print_centered(5, "Game Over！");
-        ctx.print_centered(6, &format!("You earned {} points", self.score));
-        ctx.print_centered(7, &format!("Best combo: {}", self.combo_count));
-        ctx.print_centered(8, &format!("Difficulty: {:?}", self.selected_difficulty));
-        ctx.print_centered(10, "(P) Play Again");
-        ctx.print_centered(11, "(M) Main Menu");
-        ctx.print_centered(12, "(H) High Scores");
-        ctx.print_centered(13, "(Q) Quit Game");
+        ctx.print_centered(8, "Game Over!");
+        ctx.print_centered(9, &format!("You earned {} points", self.score));
+        ctx.print_centered(10, &format!("Best combo: {}", self.combo_count));
+        ctx.print_centered(11, &format!("Difficulty: {:?}", self.selected_difficulty));
+        ctx.print(35,14, "(P) Play Again");
+        ctx.print(35,16, "(M) Main Menu");
+        ctx.print(35,18, "(H) High Scores");
+        ctx.print(35,20, "(Q) Quit Game");
 
         if !self.score_saved {
             if let Err(err) = Self::save_score(self.score, self.selected_difficulty.clone()) {
@@ -530,16 +538,17 @@ impl State {
         let scores = Self::load_scores();
         ctx.cls();
         self.set_background(ctx, "assets/scores_bg.png");
-        ctx.print_centered(5, "High Scores:");
+        ctx.print_centered(10, "High Scores:");
         
         for (i, (score, difficulty)) in scores.iter().enumerate().take(10) {
-            ctx.print_centered(
-                7 + i as i32,
+            ctx.print(
+                35,
+                13 + i as i32,
                 &format!("{}. {} ({:?})", i + 1, score, difficulty),
             );
         }
         
-        ctx.print_centered(18, "(M) Back to Menu");
+        ctx.print_centered(27, "(M) Back to Menu");
 
         if let Some(key) = ctx.key {
             match key {

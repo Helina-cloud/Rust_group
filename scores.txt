@@ -36,3 +36,9 @@
 15:Normal
 6:Normal
 12:Normal
+0:Normal
+3:Normal
+1:Normal
+0:Normal
+0:Normal
+0:Insane
